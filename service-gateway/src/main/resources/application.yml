@@ -1,0 +1,25 @@
+server:
+  port: 8886
+
+spring:
+  application:
+    name: service-gateway
+  cloud:
+    gateway:
+      discovery:
+        locator:
+          enabled: true
+          lower-case-service-id: true
+      routes:
+      - id: path_route
+        uri: http://localhost:8888
+        predicates:
+          - Path=/lemon/**
+        filters:
+          - StripPrefix=1
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8080/eureka/
+
+
