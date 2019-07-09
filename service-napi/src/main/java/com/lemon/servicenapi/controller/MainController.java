@@ -1,6 +1,6 @@
 package com.lemon.servicenapi.controller;
 
-import com.lemon.servicenapi.service.MainService;
+import com.lemon.servicenapi.client.MainClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -15,10 +15,10 @@ import org.springframework.web.bind.annotation.RestController;
 public class MainController {
 
     @Autowired
-    private MainService mainService;
+    private MainClient mainClient;
 
     @GetMapping("hello")
     public String hello(String name){
-        return mainService.hello(name);
+        return mainClient.hello(name);
     }
 }
