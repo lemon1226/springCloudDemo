@@ -27,9 +27,10 @@ public class MyLoadBalanceRule implements IRule {
     public Server choose(Object key) {
         List<Server> servers = getLoadBalancer().getAllServers();
         int retryCount = 0;
-        while(retryCount++ <= 20) {
+        int serverSize = servers.size();
+        while(retryCount++ <= 20 && serverSize > 0) {
             int count = counter.incrementAndGet();
-            Server server = servers.get(count % servers.size());
+            Server server = servers.get(count % serverSize);
             if (server.isAlive() && server.isReadyToServe()) {
                 return server;
             }
