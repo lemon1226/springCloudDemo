@@ -1,6 +1,7 @@
 package com.lemon.vo;
 
 import lombok.Data;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import java.util.Date;
 
@@ -17,5 +18,6 @@ public class LoginVo {
 
     private String password;
 
+    @DateTimeFormat(pattern = "yyyy-MM-DD HH:mm:ss")
     private Date loginTime;
 }
