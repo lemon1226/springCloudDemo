@@ -44,7 +44,7 @@ public class AuthenticationTokenFilter extends UsernamePasswordAuthenticationFil
         // 尝试获取请求头的 token
         String authToken = httpRequest.getHeader(tokenProperties.getHeader());
         // 尝试拿 token 中的 username
-        // 若是没有 token 或者拿 username 时出现异常，那么 username 为 null
+        // 若是没有 token 或者拿 username 时出现异常，那么 username 为 null 头标识：x_auth_token
         String username = this.tokenUtils.getUsernameFromToken(authToken);
 
         // 如果上面解析 token 成功并且拿到了 username 并且本次会话的权限还未被写入
