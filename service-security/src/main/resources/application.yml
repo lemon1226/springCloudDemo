@@ -1,0 +1,11 @@
+server:
+  port: 8880
+
+spring:
+  application:
+    name: service-security
+
+token:
+  secret: secret
+  expiration: 600
+  header: X_Auth_Token
