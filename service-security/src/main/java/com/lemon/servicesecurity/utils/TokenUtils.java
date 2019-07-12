@@ -1,13 +1,12 @@
 package com.lemon.servicesecurity.utils;
 
 import com.lemon.servicesecurity.config.TokenProperties;
-import com.lemon.servicesecurity.service.TokenDetail;
 import com.lemon.servicesecurity.service.impl.UserDetailImpl;
+import com.lemon.servicesecurity.vo.User;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
@@ -34,7 +33,7 @@ public class TokenUtils {
      * @param tokenDetail
      * @return
      */
-    public String generateToken(TokenDetail tokenDetail) {
+    public String generateToken(User tokenDetail) {
         Map<String, Object> claims = new HashMap<String, Object>();
         claims.put("sub", tokenDetail.getUsername());
         claims.put("created", this.generateCurrentDate());

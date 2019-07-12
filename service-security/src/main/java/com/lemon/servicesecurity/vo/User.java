@@ -1,6 +1,5 @@
 package com.lemon.servicesecurity.vo;
 
-import com.lemon.servicesecurity.service.TokenDetail;
 import lombok.Data;
 
 /**
@@ -10,7 +9,7 @@ import lombok.Data;
  * @date 2019-07-12 13:57:06 创建
  */
 @Data
-public class User implements TokenDetail {
+public class User{
 
     private String username;
     private String password;
