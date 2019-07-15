@@ -4,16 +4,12 @@ import com.lemon.servicesecurity.utils.TokenUtils;
 import com.lemon.servicesecurity.vo.ResultMap;
 import com.lemon.servicesecurity.vo.User;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-/**
- * @version V1.0.0
- * @Description 登陆接口
- * @Author liuyuequn weanyq@gmail.com
- * @Date 2017/10/3 1:30
- */
 @RestController
 public class LoginController {
 
@@ -34,13 +30,13 @@ public class LoginController {
     private ResultMap checkAccount(User user, User dataUser){
         if (dataUser == null){
             return new ResultMap().fail("434").message("账号不存在！").data("");
-        }else {
-            if (dataUser.getEnable() == false){
-                return new ResultMap().fail("452").message("账号在黑名单中").data("");
-            }
-            if (!dataUser.getPassword().equals(user.getPassword())){
-                return new ResultMap().fail("438").message("密码错误！").data("");
-            }
+        }
+
+        if (dataUser.getEnable() == false){
+            return new ResultMap().fail("452").message("账号在黑名单中").data("");
+        }
+        if (!dataUser.getPassword().equals(user.getPassword())){
+            return new ResultMap().fail("438").message("密码错误！").data("");
         }
         return null;
     }
@@ -48,6 +44,12 @@ public class LoginController {
     @RequestMapping(value = "/auth/getSome",method = RequestMethod.POST)
     public ResultMap getSome(){
         return new ResultMap().success().data("访问成功了");
+    }
+
+    @RequestMapping(value = "/auth/getAuthentication",method = RequestMethod.POST)
+    public ResultMap getAuthentication(){
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        return new ResultMap().success().data(authentication.getAuthorities());
     }
 
     private User getUserFromDatabase(String username) {
