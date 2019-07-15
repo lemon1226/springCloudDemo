@@ -41,7 +41,7 @@ public class LoginController {
         return null;
     }
 
-    @RequestMapping(value = "/auth/getSome",method = RequestMethod.POST)
+    @RequestMapping(value = "/admin/getSome",method = RequestMethod.POST)
     public ResultMap getSome(){
         return new ResultMap().success().data("访问成功了");
     }

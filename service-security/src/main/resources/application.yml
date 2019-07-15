@@ -9,3 +9,5 @@ token:
   secret: secret
   expiration: 600
   header: X_Auth_Token
+  matchers:
+

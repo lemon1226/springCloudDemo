@@ -10,7 +10,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 /**
- * description: 定义 401 处理器
+ * description: 定义 401（未登录） 处理器
  *
  * @author lemon
  * @date 2019-07-12 16:20:06 创建

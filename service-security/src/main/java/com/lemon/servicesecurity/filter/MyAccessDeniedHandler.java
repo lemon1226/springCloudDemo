@@ -10,7 +10,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 /**
- * description: 定义 403 处理器
+ * description: 定义 403(权限不足) 处理器
  *
  * @author lemon
  * @date 2019-07-12 16:21:06 创建
