@@ -1,4 +1,4 @@
-package com.lemon.servicegateway.handler;
+package com.lemon.servicegateway.auth.handler;
 
 import com.lemon.exception.BusinessRuntimeException;
 import com.lemon.utils.ResultUtil;

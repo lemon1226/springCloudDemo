@@ -1,4 +1,4 @@
-package com.lemon.servicegateway.handler;
+package com.lemon.servicegateway.auth.handler;
 
 import org.springframework.boot.autoconfigure.web.ResourceProperties;
 import org.springframework.boot.autoconfigure.web.reactive.error.AbstractErrorWebExceptionHandler;
@@ -21,6 +21,7 @@ import java.util.Map;
 
 /**
  * description: servlet异常捕获
+ *  目前没有到，如果想自定义返回response参数，写一个自定义类继承DefaultErrorAttributes
  *
  * @author lemon
  * @date 2019-07-18 15:15:06 创建

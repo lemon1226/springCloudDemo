@@ -1,4 +1,4 @@
-package com.lemon.servicegateway.config;
+package com.lemon.servicegateway.auth.config;
 
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;

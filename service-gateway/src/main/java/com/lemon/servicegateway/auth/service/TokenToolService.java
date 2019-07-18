@@ -1,7 +1,7 @@
-package com.lemon.servicegateway.service;
+package com.lemon.servicegateway.auth.service;
 
-import com.lemon.servicegateway.config.TokenProperties;
-import com.lemon.servicegateway.service.impl.UserDetailImpl;
+import com.lemon.servicegateway.auth.config.TokenProperties;
+import com.lemon.servicegateway.auth.vo.UserDetailVo;
 import com.lemon.vo.User;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
@@ -21,7 +21,7 @@ import java.util.Map;
  * @date 2019-07-16 16:53:06 创建
  */
 @Service
-public class TokenService {
+public class TokenToolService {
 
     @Autowired
     private TokenProperties tokenProperties;
@@ -104,7 +104,7 @@ public class TokenService {
      * @return
      */
     public Boolean validateToken(String token, UserDetails userDetails) {
-        UserDetailImpl user = (UserDetailImpl) userDetails;
+        UserDetailVo user = (UserDetailVo) userDetails;
         final String username = this.getUsernameFromToken(token);
         final Date created = this.getCreatedDateFromToken(token);
 

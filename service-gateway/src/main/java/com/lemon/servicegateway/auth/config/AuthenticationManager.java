@@ -1,7 +1,7 @@
-package com.lemon.servicegateway.config;
+package com.lemon.servicegateway.auth.config;
 
-import com.lemon.servicegateway.exception.AuthenticationException;
-import com.lemon.servicegateway.service.TokenService;
+import com.lemon.servicegateway.auth.exception.MyAuthenticationException;
+import com.lemon.servicegateway.auth.service.TokenToolService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.ReactiveAuthenticationManager;
@@ -23,7 +23,7 @@ import reactor.core.publisher.Mono;
 public class AuthenticationManager implements ReactiveAuthenticationManager {
 
     @Autowired
-    private TokenService tokenService;
+    private TokenToolService tokenToolService;
 
     @Autowired
     private UserDetailsService userDetailsService;
@@ -34,18 +34,18 @@ public class AuthenticationManager implements ReactiveAuthenticationManager {
 
         String username;
         try {
-            username = tokenService.getUsernameFromToken(authToken);
+            username = tokenToolService.getUsernameFromToken(authToken);
         } catch (Exception e) {
             username = null;
         }
 
         if(username == null){
-            return Mono.error(new AuthenticationException(HttpStatus.UNAUTHORIZED, "用户名失效，请登录"));
+            return Mono.error(new MyAuthenticationException(HttpStatus.UNAUTHORIZED, "用户名失效，请登录"));
         }
 
         if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
             UserDetails userDetails = userDetailsService.loadUserByUsername(username);
-            if (tokenService.validateToken(authToken, userDetails)) {
+            if (tokenToolService.validateToken(authToken, userDetails)) {
 
                 UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(
                         username,

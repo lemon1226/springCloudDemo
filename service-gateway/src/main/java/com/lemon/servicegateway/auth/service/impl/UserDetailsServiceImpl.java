@@ -1,8 +1,12 @@
-package com.lemon.servicegateway.service.impl;
+package com.lemon.servicegateway.auth.service.impl;
 
-import com.lemon.servicegateway.factory.SecurityModelFactory;
+import com.lemon.servicegateway.auth.exception.MyAuthenticationException;
+import com.lemon.servicegateway.auth.factory.SecurityModelFactory;
+import com.lemon.servicegateway.service.LoginService;
 import com.lemon.vo.User;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Primary;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -18,29 +22,17 @@ import org.springframework.stereotype.Service;
 @Primary
 public class UserDetailsServiceImpl implements UserDetailsService {
 
-
+    @Autowired
+    private LoginService loginService;
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        User user = getUserFromDatabase(username);
+        User user = loginService.getUserFromDatabase(username);
 
         if (user == null) {
-            throw new UsernameNotFoundException(String.format("No user found with username '%s'.", username));
+            throw new MyAuthenticationException(HttpStatus.FORBIDDEN, "未找到对应的用户");
         } else {
             return SecurityModelFactory.create(user);
         }
-    }
-
-    private User getUserFromDatabase(String username) {
-        if("admin".equals(username)){
-            User user = new User();
-            user.setUsername(username);
-            user.setPassword("admin");
-            user.setEnable(true);
-            user.setAuthorities("1,2,3,4,5");
-            user.setLastPasswordChange(1111L);
-            return user;
-        }
-        return null;
     }
 }

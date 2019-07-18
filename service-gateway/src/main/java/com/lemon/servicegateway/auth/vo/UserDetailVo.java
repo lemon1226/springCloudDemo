@@ -1,4 +1,4 @@
-package com.lemon.servicegateway.service.impl;
+package com.lemon.servicegateway.auth.vo;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.springframework.security.core.GrantedAuthority;
@@ -13,7 +13,7 @@ import java.util.Date;
  * @author lemon
  * @date 2019-07-12 14:12:06 创建
  */
-public class UserDetailImpl implements UserDetails {
+public class UserDetailVo implements UserDetails {
     // 开始定义必要的属性
     private String id;
 
@@ -37,11 +37,11 @@ public class UserDetailImpl implements UserDetails {
 
     // 结束定义 UserDetails 必要的属性
 
-    public UserDetailImpl() {
+    public UserDetailVo() {
         super();
     }
 
-    public UserDetailImpl(String id, String username, String password, Date lastPasswordReset, Collection<? extends GrantedAuthority> authorities, Boolean enabled) {
+    public UserDetailVo(String id, String username, String password, Date lastPasswordReset, Collection<? extends GrantedAuthority> authorities, Boolean enabled) {
         this.setId(id);
         this.setUsername(username);
         this.setPassword(password);

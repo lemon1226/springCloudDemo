@@ -1,6 +1,6 @@
-package com.lemon.servicegateway.config;
+package com.lemon.servicegateway.auth.config;
 
-import com.lemon.servicegateway.exception.AuthenticationException;
+import com.lemon.servicegateway.auth.exception.MyAuthenticationException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.http.HttpMethod;
@@ -33,11 +33,11 @@ public class WebSecurityConfig{
                 .exceptionHandling()
                 .authenticationEntryPoint((swe, e) -> {
                     return Mono.fromRunnable(() -> {
-                        new AuthenticationException(HttpStatus.UNAUTHORIZED);
+                        new MyAuthenticationException(HttpStatus.UNAUTHORIZED);
                     });
                 }).accessDeniedHandler((swe, e) -> {
                     return Mono.fromRunnable(() -> {
-                        new AuthenticationException(HttpStatus.FORBIDDEN);
+                        new MyAuthenticationException(HttpStatus.FORBIDDEN);
                     });
                 }).and()
                 .csrf().disable()

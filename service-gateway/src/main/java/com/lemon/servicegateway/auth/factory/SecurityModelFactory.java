@@ -1,6 +1,6 @@
-package com.lemon.servicegateway.factory;
+package com.lemon.servicegateway.auth.factory;
 
-import com.lemon.servicegateway.service.impl.UserDetailImpl;
+import com.lemon.servicegateway.auth.vo.UserDetailVo;
 import com.lemon.vo.User;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.AuthorityUtils;
@@ -15,7 +15,7 @@ import java.util.Date;
  */
 public class SecurityModelFactory {
 
-    public static UserDetailImpl create(User user) {
+    public static UserDetailVo create(User user) {
         Collection<? extends GrantedAuthority> authorities;
         try {
             authorities = AuthorityUtils.commaSeparatedStringToAuthorityList(user.getAuthorities());
@@ -25,7 +25,7 @@ public class SecurityModelFactory {
 
         Date lastPasswordReset = new Date();
         lastPasswordReset.setTime(user.getLastPasswordChange());
-        return new UserDetailImpl(
+        return new UserDetailVo(
                 user.getUsername(),
                 user.getUsername(),
                 user.getPassword(),

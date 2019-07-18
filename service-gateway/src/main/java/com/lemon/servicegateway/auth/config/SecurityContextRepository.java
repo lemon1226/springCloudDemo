@@ -1,6 +1,6 @@
-package com.lemon.servicegateway.config;
+package com.lemon.servicegateway.auth.config;
 
-import com.lemon.servicegateway.exception.AuthenticationException;
+import com.lemon.servicegateway.auth.exception.MyAuthenticationException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.server.reactive.ServerHttpRequest;
@@ -30,7 +30,7 @@ public class SecurityContextRepository implements ServerSecurityContextRepositor
 
     @Override
     public Mono<Void> save(ServerWebExchange swe, SecurityContext sc) {
-        throw new AuthenticationException(HttpStatus.FORBIDDEN);
+        throw new MyAuthenticationException(HttpStatus.FORBIDDEN);
     }
 
     @Override
