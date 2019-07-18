@@ -22,4 +22,10 @@ eureka:
     service-url:
       defaultZone: http://localhost:8080/eureka/
 
+token:
+  secret: secret
+  expiration: 60
+  header: X_Auth_Token
+  matchers:
+
 
