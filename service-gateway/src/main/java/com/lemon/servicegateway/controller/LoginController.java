@@ -1,7 +1,8 @@
 package com.lemon.servicegateway.controller;
 
+import com.lemon.baseutils.util.TokenUtils;
 import com.lemon.exception.BusinessRuntimeException;
-import com.lemon.servicegateway.auth.service.TokenToolService;
+import com.lemon.servicegateway.auth.config.TokenProperties;
 import com.lemon.servicegateway.service.LoginService;
 import com.lemon.utils.ResultUtil;
 import com.lemon.vo.Result;
@@ -28,7 +29,7 @@ import java.util.Collection;
 public class LoginController {
 
     @Autowired
-    private TokenToolService tokenToolService;
+    private TokenProperties tokenProperties;
 
     @Autowired
     private LoginService loginService;
@@ -41,7 +42,8 @@ public class LoginController {
         checkAccount(user, userDetails);
 
         if (user.getPassword().equals(userDetails.getPassword())) {
-            return ResultUtil.success(tokenToolService.generateToken(userDetails));
+            return ResultUtil.success(TokenUtils.generateToken(userDetails.getUsername(),
+                    tokenProperties.getExpiration(), tokenProperties.getSecret()));
         }
 
         return ResultUtil.busFail("密码错误");

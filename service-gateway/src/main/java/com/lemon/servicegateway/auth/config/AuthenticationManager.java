@@ -1,7 +1,8 @@
 package com.lemon.servicegateway.auth.config;
 
+import com.lemon.baseutils.util.TokenUtils;
 import com.lemon.servicegateway.auth.exception.MyAuthenticationException;
-import com.lemon.servicegateway.auth.service.TokenToolService;
+import com.lemon.servicegateway.auth.vo.UserDetailVo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.ReactiveAuthenticationManager;
@@ -23,10 +24,10 @@ import reactor.core.publisher.Mono;
 public class AuthenticationManager implements ReactiveAuthenticationManager {
 
     @Autowired
-    private TokenToolService tokenToolService;
+    private UserDetailsService userDetailsService;
 
     @Autowired
-    private UserDetailsService userDetailsService;
+    private TokenProperties tokenProperties;
 
     @Override
     public Mono<Authentication> authenticate(Authentication authentication) {
@@ -34,7 +35,7 @@ public class AuthenticationManager implements ReactiveAuthenticationManager {
 
         String username;
         try {
-            username = tokenToolService.getUsernameFromToken(authToken);
+            username = TokenUtils.getUsernameFromToken(authToken, tokenProperties.getSecret());
         } catch (Exception e) {
             username = null;
         }
@@ -45,7 +46,9 @@ public class AuthenticationManager implements ReactiveAuthenticationManager {
 
         if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
             UserDetails userDetails = userDetailsService.loadUserByUsername(username);
-            if (tokenToolService.validateToken(authToken, userDetails)) {
+            UserDetailVo user = (UserDetailVo) userDetails;
+            if (TokenUtils.validateToken(authToken, user.getUsername(),
+                    tokenProperties.getSecret(), user.getLastPasswordReset())) {
 
                 UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(
                         username,

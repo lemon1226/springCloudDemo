@@ -17,7 +17,9 @@ public class TokenProperties {
 
     private String secret;
 
-    private Long expiration;
+    private long expiration;
 
     private String header;
+
+    private long refreshInterval;
 }

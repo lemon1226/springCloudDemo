@@ -1,4 +1,4 @@
-package com.lemon.servicegateway.auth.service.impl;
+package com.lemon.servicegateway.auth.service;
 
 import com.lemon.servicegateway.auth.exception.MyAuthenticationException;
 import com.lemon.servicegateway.auth.factory.SecurityModelFactory;
