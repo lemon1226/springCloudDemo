@@ -62,6 +62,15 @@ public class LoginController {
             user.setLastPasswordChange(22222L);
             return user;
         }
+        if("admin".equals(username)){
+            User user = new User();
+            user.setUsername(username);
+            user.setPassword("admin");
+            user.setEnable(true);
+            user.setAuthorities("1,2,3,4,5");
+            user.setLastPasswordChange(22222L);
+            return user;
+        }
         return null;
     }
 

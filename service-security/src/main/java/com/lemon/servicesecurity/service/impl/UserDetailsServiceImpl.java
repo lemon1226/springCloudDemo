@@ -41,6 +41,15 @@ public class UserDetailsServiceImpl implements UserDetailsService {
             user.setLastPasswordChange(1111L);
             return user;
         }
+        if("admin".equals(username)){
+            User user = new User();
+            user.setUsername(username);
+            user.setPassword("admin");
+            user.setEnable(true);
+            user.setAuthorities("1,2,3,4,5");
+            user.setLastPasswordChange(1111L);
+            return user;
+        }
         return null;
     }
 }

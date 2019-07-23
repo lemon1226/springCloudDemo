@@ -3,15 +3,13 @@ package com.lemon.servicesecurity.filter;
 import com.lemon.servicesecurity.config.TokenProperties;
 import com.lemon.servicesecurity.utils.TokenUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
-import org.springframework.stereotype.Component;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
@@ -48,6 +46,7 @@ public class AuthenticationTokenFilter extends UsernamePasswordAuthenticationFil
         String username = this.tokenUtils.getUsernameFromToken(authToken);
 
         // 如果上面解析 token 成功并且拿到了 username 并且本次会话的权限还未被写入
+        Authentication Authentication = SecurityContextHolder.getContext().getAuthentication();
         if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
             // 用 UserDetailsService 从数据库中拿到用户的 UserDetails 类
             // UserDetails 类是 Spring Security 用于保存用户权限的实体类
