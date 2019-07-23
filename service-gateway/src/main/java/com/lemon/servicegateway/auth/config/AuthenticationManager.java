@@ -1,6 +1,7 @@
 package com.lemon.servicegateway.auth.config;
 
 import com.lemon.baseutils.util.TokenUtils;
+import com.lemon.servicegateway.auth.cache.UserCache;
 import com.lemon.servicegateway.auth.exception.MyAuthenticationException;
 import com.lemon.servicegateway.auth.vo.UserDetailVo;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -8,7 +9,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.ReactiveAuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Component;
@@ -41,25 +41,48 @@ public class AuthenticationManager implements ReactiveAuthenticationManager {
         }
 
         if(username == null){
-            return Mono.error(new MyAuthenticationException(HttpStatus.UNAUTHORIZED, "用户名失效，请登录"));
+            return Mono.error(new MyAuthenticationException(HttpStatus.UNAUTHORIZED, "用户信息失效，请重新登录"));
         }
 
-        if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-            UserDetails userDetails = userDetailsService.loadUserByUsername(username);
-            UserDetailVo user = (UserDetailVo) userDetails;
-            if (TokenUtils.validateToken(authToken, user.getUsername(),
-                    tokenProperties.getSecret(), user.getLastPasswordReset())) {
-
-                UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(
-                        username,
-                        null,
-                        userDetails.getAuthorities());
-
-                SecurityContextHolder.getContext().setAuthentication(auth);
-                return Mono.just(auth);
+        UserDetailVo userInfo = UserCache.getUser(username);
+        boolean isReCheck = false;
+        if (userInfo == null) {
+            isReCheck = true;
+        } else {
+            String password;
+            try {
+                password = TokenUtils.getPasswordFromToken(authToken, tokenProperties.getSecret());
+            } catch (Exception e) {
+                password = null;
+            }
+            if(password == null){
+                return Mono.error(new MyAuthenticationException(HttpStatus.UNAUTHORIZED, "用户信息不正确，请登录"));
+            }
+            if(!userInfo.getPassword().equals(password)){
+                isReCheck = true;
             }
         }
 
-        return Mono.just(SecurityContextHolder.getContext().getAuthentication());
+        if(isReCheck){
+            UserDetails userDetails = userDetailsService.loadUserByUsername(username);
+            UserDetailVo user = (UserDetailVo) userDetails;
+            if (TokenUtils.validateToken(authToken, user.getUsername(), user.getPassword(),
+                    tokenProperties.getSecret(), user.getLastPasswordReset())) {
+
+                UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(
+                        userDetails,
+                        userDetails.getUsername(),
+                        userDetails.getAuthorities());
+
+                UserCache.setUser(username, user);
+                return Mono.just(auth);
+            } else {
+                return Mono.error(new MyAuthenticationException(HttpStatus.UNAUTHORIZED, "用户信息失效，请重新登录"));
+            }
+        }
+        return Mono.just(new UsernamePasswordAuthenticationToken(
+                userInfo,
+                userInfo.getUsername(),
+                userInfo.getAuthorities()));
     }
 }

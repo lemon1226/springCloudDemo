@@ -1,6 +1,7 @@
 package com.lemon.servicegateway.auth.handler;
 
 import com.lemon.exception.BusinessRuntimeException;
+import com.lemon.servicegateway.auth.exception.MyAuthenticationException;
 import com.lemon.utils.ResultUtil;
 import com.lemon.vo.Result;
 import org.slf4j.Logger;
@@ -31,5 +32,10 @@ public class CustomExceptionHandler {
     public Result<Object> handleException(Exception e) {
         LOGGER.error("系统异常", e);
         return ResultUtil.fail("系统异常");
+    }
+
+    @ExceptionHandler(MyAuthenticationException.class)
+    public void handleMyAuthenticationException(MyAuthenticationException e) {
+        throw new MyAuthenticationException(e.getStatus(), e.getReason());
     }
 }

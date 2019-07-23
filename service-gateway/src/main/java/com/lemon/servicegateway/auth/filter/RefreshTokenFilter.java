@@ -35,9 +35,10 @@ public class RefreshTokenFilter implements WebFilter {
 
                 if (null != expirationDate && expirationDate.getTime() - new Date().getTime() <= tokenProperties.getRefreshInterval() * 1000) {
                     String username = TokenUtils.getUsernameFromToken(authToken, tokenProperties.getSecret());
+                    String password = TokenUtils.getPasswordFromToken(authToken, tokenProperties.getSecret());
 
                     if (username != null) {
-                        String tokenUUID = TokenUtils.generateToken(username,
+                        String tokenUUID = TokenUtils.generateToken(username, password,
                                 tokenProperties.getExpiration(), tokenProperties.getSecret());
                         exchange.getResponse().getHeaders().put(tokenProperties.getHeader(), Arrays.asList(tokenUUID));
                     }

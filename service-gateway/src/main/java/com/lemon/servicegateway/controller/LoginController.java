@@ -2,19 +2,23 @@ package com.lemon.servicegateway.controller;
 
 import com.lemon.baseutils.util.TokenUtils;
 import com.lemon.exception.BusinessRuntimeException;
+import com.lemon.servicegateway.auth.cache.UserCache;
 import com.lemon.servicegateway.auth.config.TokenProperties;
+import com.lemon.servicegateway.auth.exception.MyAuthenticationException;
+import com.lemon.servicegateway.auth.vo.UserDetailVo;
 import com.lemon.servicegateway.service.LoginService;
 import com.lemon.utils.ResultUtil;
 import com.lemon.vo.Result;
 import com.lemon.vo.User;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.Authentication;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.server.ServerWebExchange;
 
 import java.util.Collection;
 
@@ -43,16 +47,22 @@ public class LoginController {
 
         if (user.getPassword().equals(userDetails.getPassword())) {
             return ResultUtil.success(TokenUtils.generateToken(userDetails.getUsername(),
-                    tokenProperties.getExpiration(), tokenProperties.getSecret()));
+                    userDetails.getPassword(), tokenProperties.getExpiration(), tokenProperties.getSecret()));
         }
 
         return ResultUtil.busFail("密码错误");
     }
 
     @PostMapping(value = "getAuthentications")
-    public Result<Collection<? extends GrantedAuthority>> getAuthentication(){
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        return ResultUtil.success(authentication.getAuthorities());
+    public Result<Collection<? extends GrantedAuthority>> getAuthentication(ServerWebExchange swe){
+        ServerHttpRequest request = swe.getRequest();
+        String authHeader = request.getHeaders().getFirst(tokenProperties.getHeader());
+        UserDetailVo user = UserCache.getUser(TokenUtils.getUsernameFromToken(
+                authHeader, tokenProperties.getSecret()));
+        if(null == user){
+            throw new MyAuthenticationException(HttpStatus.FORBIDDEN, "用户信息过期，请重新登录");
+        }
+        return ResultUtil.success(user.getAuthorities());
     }
 
     private void checkAccount(User user, User dataUser){

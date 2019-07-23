@@ -28,16 +28,16 @@ public class WebSecurityConfig{
     private SecurityContextRepository securityContextRepository;
 
     @Bean
-    public SecurityWebFilterChain securitygWebFilterChain(ServerHttpSecurity http) {
+    public SecurityWebFilterChain securityWebFilterChain(ServerHttpSecurity http) {
         return http
                 .exceptionHandling()
                 .authenticationEntryPoint((swe, e) -> {
                     return Mono.fromRunnable(() -> {
-                        new MyAuthenticationException(HttpStatus.UNAUTHORIZED);
+                        throw new MyAuthenticationException(HttpStatus.UNAUTHORIZED);
                     });
                 }).accessDeniedHandler((swe, e) -> {
                     return Mono.fromRunnable(() -> {
-                        new MyAuthenticationException(HttpStatus.FORBIDDEN);
+                        throw new MyAuthenticationException(HttpStatus.FORBIDDEN);
                     });
                 }).and()
                 .csrf().disable()
