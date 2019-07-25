@@ -1,9 +1,9 @@
 package com.lemon.servicegateway.auth.config;
 
 import com.lemon.baseutils.util.TokenUtils;
+import com.lemon.framework.utils.RedisUtil;
 import com.lemon.servicegateway.auth.exception.MyAuthenticationException;
 import com.lemon.servicegateway.auth.vo.UserDetailVo;
-import com.lemon.servicegateway.util.RedisUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.ReactiveAuthenticationManager;
