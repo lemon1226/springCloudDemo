@@ -3,9 +3,12 @@ package com.lemon.servicegateway.auth.vo;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.util.CollectionUtils;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
+import java.util.List;
 
 /**
  * description:
@@ -25,6 +28,8 @@ public class UserDetailVo implements UserDetails {
 
     @JsonIgnore
     private Collection<? extends GrantedAuthority> authorities;
+
+    private List<String> authoritieList = new ArrayList<>();
 
     private Boolean enabled;
 
@@ -91,6 +96,11 @@ public class UserDetailVo implements UserDetails {
 
     public void setAuthorities(Collection<? extends GrantedAuthority> authorities) {
         this.authorities = authorities;
+        if(!CollectionUtils.isEmpty(this.authorities)){
+            this.authorities.stream().forEach(a -> {
+                authoritieList.add(((GrantedAuthority) a).getAuthority());
+            });
+        }
     }
 
     @JsonIgnore
@@ -147,5 +157,13 @@ public class UserDetailVo implements UserDetails {
     @Override
     public boolean isEnabled() {
         return this.getEnabled();
+    }
+
+    public List<String> getAuthoritieList() {
+        return authoritieList;
+    }
+
+    public void setAuthoritieList(List<String> authoritieList) {
+        this.authoritieList = authoritieList;
     }
 }

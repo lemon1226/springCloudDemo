@@ -14,14 +14,13 @@ import com.lemon.vo.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.server.reactive.ServerHttpRequest;
-import org.springframework.security.core.GrantedAuthority;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ServerWebExchange;
 
-import java.util.Collection;
+import java.util.List;
 
 /**
  * description: 登录控制器
@@ -58,14 +57,14 @@ public class LoginController {
     }
 
     @PostMapping(value = "getAuthentications")
-    public Result<Collection<? extends GrantedAuthority>> getAuthentication(ServerWebExchange swe){
+    public Result<List<String>> getAuthentication(ServerWebExchange swe){
         ServerHttpRequest request = swe.getRequest();
         String authToken = request.getHeaders().getFirst(tokenProperties.getHeader());
         UserDetailVo user = (UserDetailVo) redisUtil.get(authToken);
         if(null == user){
             throw new MyAuthenticationException(HttpStatus.FORBIDDEN, "用户信息过期，请重新登录");
         }
-        return ResultUtil.success(user.getAuthorities());
+        return ResultUtil.success(user.getAuthoritieList());
     }
 
     private void checkAccount(User user, User dataUser){
