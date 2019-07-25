@@ -18,7 +18,7 @@ public class LoginServiceImpl implements LoginService {
         User user = new User();
         if("admin".equals(username)){
             user.setUsername(username);
-            user.setPassword("admin");
+            user.setPassword("$2a$10$.Ame5KMmFj1UFm5MjsIH1eB0QRc1UmYyF7YqDduj9nqmyY/S6WJni");
             user.setEnable(true);
             user.setAuthorities("1,2,3,4,5");
             user.setLastPasswordChange(22222L);
@@ -26,7 +26,7 @@ public class LoginServiceImpl implements LoginService {
         }
         if("lemon".equals(username)){
             user.setUsername(username);
-            user.setPassword("lemon");
+            user.setPassword("$2a$10$.Ame5KMmFj1UFm5MjsIH1eB0QRc1UmYyF7YqDduj9nqmyY/S6WJni");
             user.setEnable(true);
             user.setAuthorities("1,2,3,4,5");
             user.setLastPasswordChange(22222L);

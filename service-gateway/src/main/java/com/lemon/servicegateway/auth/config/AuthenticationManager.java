@@ -1,9 +1,9 @@
 package com.lemon.servicegateway.auth.config;
 
 import com.lemon.baseutils.util.TokenUtils;
-import com.lemon.servicegateway.auth.cache.UserCache;
 import com.lemon.servicegateway.auth.exception.MyAuthenticationException;
 import com.lemon.servicegateway.auth.vo.UserDetailVo;
+import com.lemon.servicegateway.util.RedisUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.ReactiveAuthenticationManager;
@@ -29,6 +29,9 @@ public class AuthenticationManager implements ReactiveAuthenticationManager {
     @Autowired
     private TokenProperties tokenProperties;
 
+    @Autowired
+    private RedisUtil redisUtil;
+
     @Override
     public Mono<Authentication> authenticate(Authentication authentication) {
         String authToken = authentication.getCredentials().toString();
@@ -44,7 +47,7 @@ public class AuthenticationManager implements ReactiveAuthenticationManager {
             return Mono.error(new MyAuthenticationException(HttpStatus.UNAUTHORIZED, "用户信息失效，请重新登录"));
         }
 
-        UserDetailVo userInfo = UserCache.getUser(username);
+        UserDetailVo userInfo = (UserDetailVo) redisUtil.get(authToken);
         boolean isReCheck = false;
         if (userInfo == null) {
             isReCheck = true;
@@ -71,13 +74,14 @@ public class AuthenticationManager implements ReactiveAuthenticationManager {
 
                 UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(
                         userDetails,
-                        userDetails.getUsername(),
-                        userDetails.getAuthorities());
+                        username,
+                        user.getAuthorities());
 
-                UserCache.setUser(username, user);
+                redisUtil.set(authToken, user);
+                redisUtil.expire(authToken, tokenProperties.getExpiration());
                 return Mono.just(auth);
             } else {
-                return Mono.error(new MyAuthenticationException(HttpStatus.UNAUTHORIZED, "用户信息失效，请重新登录"));
+                 return Mono.error(new MyAuthenticationException(HttpStatus.UNAUTHORIZED, "用户信息失效，请重新登录"));
             }
         }
         return Mono.just(new UsernamePasswordAuthenticationToken(

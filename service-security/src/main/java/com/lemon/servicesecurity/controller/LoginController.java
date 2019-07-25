@@ -1,5 +1,6 @@
 package com.lemon.servicesecurity.controller;
 
+import com.lemon.baseutils.util.BCryptPasswordEncoderUtils;
 import com.lemon.servicesecurity.utils.TokenUtils;
 import com.lemon.servicesecurity.vo.ResultMap;
 import com.lemon.servicesecurity.vo.User;
@@ -35,7 +36,7 @@ public class LoginController {
         if (dataUser.getEnable() == false){
             return new ResultMap().fail("452").message("账号在黑名单中").data("");
         }
-        if (!dataUser.getPassword().equals(user.getPassword())){
+        if (!BCryptPasswordEncoderUtils.match(user.getPassword(), dataUser.getPassword())){
             return new ResultMap().fail("438").message("密码错误！").data("");
         }
         return null;

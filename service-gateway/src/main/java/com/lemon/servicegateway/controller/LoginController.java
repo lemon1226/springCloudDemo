@@ -1,12 +1,13 @@
 package com.lemon.servicegateway.controller;
 
+import com.lemon.baseutils.util.BCryptPasswordEncoderUtils;
 import com.lemon.baseutils.util.TokenUtils;
 import com.lemon.exception.BusinessRuntimeException;
-import com.lemon.servicegateway.auth.cache.UserCache;
 import com.lemon.servicegateway.auth.config.TokenProperties;
 import com.lemon.servicegateway.auth.exception.MyAuthenticationException;
 import com.lemon.servicegateway.auth.vo.UserDetailVo;
 import com.lemon.servicegateway.service.LoginService;
+import com.lemon.servicegateway.util.RedisUtil;
 import com.lemon.utils.ResultUtil;
 import com.lemon.vo.Result;
 import com.lemon.vo.User;
@@ -38,6 +39,9 @@ public class LoginController {
     @Autowired
     private LoginService loginService;
 
+    @Autowired
+    private RedisUtil redisUtil;
+
     @PostMapping(value = "/login")
     public Result login(User user){
 
@@ -45,7 +49,7 @@ public class LoginController {
 
         checkAccount(user, userDetails);
 
-        if (user.getPassword().equals(userDetails.getPassword())) {
+        if (BCryptPasswordEncoderUtils.match(user.getPassword(), userDetails.getPassword())) {
             return ResultUtil.success(TokenUtils.generateToken(userDetails.getUsername(),
                     userDetails.getPassword(), tokenProperties.getExpiration(), tokenProperties.getSecret()));
         }
@@ -56,9 +60,8 @@ public class LoginController {
     @PostMapping(value = "getAuthentications")
     public Result<Collection<? extends GrantedAuthority>> getAuthentication(ServerWebExchange swe){
         ServerHttpRequest request = swe.getRequest();
-        String authHeader = request.getHeaders().getFirst(tokenProperties.getHeader());
-        UserDetailVo user = UserCache.getUser(TokenUtils.getUsernameFromToken(
-                authHeader, tokenProperties.getSecret()));
+        String authToken = request.getHeaders().getFirst(tokenProperties.getHeader());
+        UserDetailVo user = (UserDetailVo) redisUtil.get(authToken);
         if(null == user){
             throw new MyAuthenticationException(HttpStatus.FORBIDDEN, "用户信息过期，请重新登录");
         }

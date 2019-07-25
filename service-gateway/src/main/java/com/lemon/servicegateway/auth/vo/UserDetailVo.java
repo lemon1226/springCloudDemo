@@ -23,6 +23,7 @@ public class UserDetailVo implements UserDetails {
 
     private Date lastPasswordReset;
 
+    @JsonIgnore
     private Collection<? extends GrantedAuthority> authorities;
 
     private Boolean enabled;
@@ -66,7 +67,6 @@ public class UserDetailVo implements UserDetails {
         this.username = username;
     }
 
-    @JsonIgnore
     public String getPassword() {
         return this.password;
     }
