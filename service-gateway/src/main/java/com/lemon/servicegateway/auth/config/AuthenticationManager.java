@@ -1,18 +1,20 @@
 package com.lemon.servicegateway.auth.config;
 
 import com.lemon.baseutils.util.TokenUtils;
-import com.lemon.framework.utils.RedisUtil;
 import com.lemon.servicegateway.auth.exception.MyAuthenticationException;
-import com.lemon.servicegateway.auth.vo.UserDetailVo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.ReactiveAuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.stereotype.Component;
+import org.springframework.util.CollectionUtils;
 import reactor.core.publisher.Mono;
+
+import java.util.Collection;
+import java.util.List;
 
 /**
  * description: 权限管理类
@@ -24,69 +26,38 @@ import reactor.core.publisher.Mono;
 public class AuthenticationManager implements ReactiveAuthenticationManager {
 
     @Autowired
-    private UserDetailsService userDetailsService;
-
-    @Autowired
     private TokenProperties tokenProperties;
-
-    @Autowired
-    private RedisUtil redisUtil;
 
     @Override
     public Mono<Authentication> authenticate(Authentication authentication) {
         String authToken = authentication.getCredentials().toString();
 
         String username;
+        List<String> authoritieList;
         try {
             username = TokenUtils.getUsernameFromToken(authToken, tokenProperties.getSecret());
+            authoritieList = TokenUtils.getAuthoritiesFromToken(authToken, tokenProperties.getSecret());
         } catch (Exception e) {
             username = null;
+            authoritieList = null;
         }
 
-        if(username == null){
+        if(username == null || CollectionUtils.isEmpty(authoritieList)){
             return Mono.error(new MyAuthenticationException(HttpStatus.UNAUTHORIZED, "用户信息失效，请重新登录"));
         }
 
-        UserDetailVo userInfo = (UserDetailVo) redisUtil.get(authToken);
-        boolean isReCheck = false;
-        if (userInfo == null) {
-            isReCheck = true;
-        } else {
-            String password;
-            try {
-                password = TokenUtils.getPasswordFromToken(authToken, tokenProperties.getSecret());
-            } catch (Exception e) {
-                password = null;
-            }
-            if(password == null){
-                return Mono.error(new MyAuthenticationException(HttpStatus.UNAUTHORIZED, "用户信息不正确，请登录"));
-            }
-            if(!userInfo.getPassword().equals(password)){
-                isReCheck = true;
-            }
+        Collection<? extends GrantedAuthority> authorities;
+        try {
+            authorities = AuthorityUtils.createAuthorityList((String[]) authoritieList.toArray());
+        } catch (Exception e) {
+            authorities = null;
         }
 
-        if(isReCheck){
-            UserDetails userDetails = userDetailsService.loadUserByUsername(username);
-            UserDetailVo user = (UserDetailVo) userDetails;
-            if (TokenUtils.validateToken(authToken, user.getUsername(), user.getPassword(),
-                    tokenProperties.getSecret(), user.getLastPasswordReset())) {
+        UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(
+                username,
+                username,
+                authorities);
 
-                UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(
-                        userDetails,
-                        username,
-                        user.getAuthorities());
-
-                redisUtil.set(authToken, user);
-                redisUtil.expire(authToken, tokenProperties.getExpiration());
-                return Mono.just(auth);
-            } else {
-                 return Mono.error(new MyAuthenticationException(HttpStatus.UNAUTHORIZED, "用户信息失效，请重新登录"));
-            }
-        }
-        return Mono.just(new UsernamePasswordAuthenticationToken(
-                userInfo,
-                userInfo.getUsername(),
-                userInfo.getAuthorities()));
+        return Mono.just(auth);
     }
 }

@@ -1,18 +1,20 @@
 package com.lemon.servicesecurity.controller;
 
-import com.lemon.baseutils.util.BCryptPasswordEncoderUtils;
 import com.lemon.servicesecurity.utils.TokenUtils;
 import com.lemon.servicesecurity.vo.ResultMap;
 import com.lemon.servicesecurity.vo.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 public class LoginController {
+
+    BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder();
 
     @Autowired
     private TokenUtils tokenUtils;
@@ -36,7 +38,7 @@ public class LoginController {
         if (dataUser.getEnable() == false){
             return new ResultMap().fail("452").message("账号在黑名单中").data("");
         }
-        if (!BCryptPasswordEncoderUtils.match(user.getPassword(), dataUser.getPassword())){
+        if (!bCryptPasswordEncoder.matches(user.getPassword(), dataUser.getPassword())){
             return new ResultMap().fail("438").message("密码错误！").data("");
         }
         return null;

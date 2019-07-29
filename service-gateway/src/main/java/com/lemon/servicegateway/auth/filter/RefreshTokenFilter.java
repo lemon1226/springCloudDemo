@@ -3,14 +3,18 @@ package com.lemon.servicegateway.auth.filter;
 import com.lemon.baseutils.util.TokenUtils;
 import com.lemon.servicegateway.auth.config.TokenProperties;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpCookie;
+import org.springframework.http.ResponseCookie;
+import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.stereotype.Component;
+import org.springframework.util.CollectionUtils;
 import org.springframework.web.server.ServerWebExchange;
 import org.springframework.web.server.WebFilter;
 import org.springframework.web.server.WebFilterChain;
 import reactor.core.publisher.Mono;
 
-import java.util.Arrays;
 import java.util.Date;
+import java.util.List;
 
 /**
  * description: 如果N分钟后超时，但是有请求，延长token失效时间
@@ -28,19 +32,28 @@ public class RefreshTokenFilter implements WebFilter {
     public Mono<Void> filter(ServerWebExchange exchange, WebFilterChain chain) {
 
         try {
-            String authToken = exchange.getRequest().getHeaders().getFirst(tokenProperties.getHeader());
+            ServerHttpRequest request = exchange.getRequest();
+            List<HttpCookie> cookieList= request.getCookies().get(tokenProperties.getCookieName());
 
-            if (null != authToken) {
+            if (!CollectionUtils.isEmpty(cookieList)) {
+                HttpCookie cookie = cookieList.get(0);
+                String authToken = cookie.getValue();
+
                 Date expirationDate = TokenUtils.getExpirationDateFromToken(authToken, tokenProperties.getSecret());
 
                 if (null != expirationDate && expirationDate.getTime() - new Date().getTime() <= tokenProperties.getRefreshInterval() * 1000) {
                     String username = TokenUtils.getUsernameFromToken(authToken, tokenProperties.getSecret());
-                    String password = TokenUtils.getPasswordFromToken(authToken, tokenProperties.getSecret());
+                    List<String> authorities = TokenUtils.getAuthoritiesFromToken(authToken, tokenProperties.getSecret());
 
                     if (username != null) {
-                        String tokenUUID = TokenUtils.generateToken(username, password,
+                        String tokenUUID = TokenUtils.generateToken(username, authorities,
                                 tokenProperties.getExpiration(), tokenProperties.getSecret());
-                        exchange.getResponse().getHeaders().put(tokenProperties.getHeader(), Arrays.asList(tokenUUID));
+
+                        ResponseCookie responseCookie = ResponseCookie.from(tokenProperties.getCookieName(), tokenUUID)
+                                .maxAge(tokenProperties.getExpiration()).build();
+
+                        request.getCookies().clear();
+                        exchange.getResponse().addCookie(responseCookie);
                     }
                 }
             }

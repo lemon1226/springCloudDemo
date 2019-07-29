@@ -11,31 +11,16 @@ spring:
           enabled: true
           lower-case-service-id: true
       routes:
-      - id: path_route
+      - id: path_route_lemon
         uri: http://localhost:8888
         predicates:
-          - Path=/lemon/**
+          - Path=/lemon/*
         filters:
           - StripPrefix=1
-  redis:
-    # Redis数据库索引（默认为0）
-    database: 1
-    # Redis服务器地址
-    host: 10.101.228.79
-    # Redis服务器连接端口
-    port: 6379
-    jedis:
-      pool:
-        #最大连接数
-        max-active: 8
-        #最大阻塞等待时间(负数表示没限制)
-        max-wait: -1
-        #最大空闲
-        max-idle: 8
-        #最小空闲
-        min-idle: 0
-      #连接超时时间
-      timeout: 1000
+      - id: path_route_user
+        uri: http://localhost:8001
+        predicates:
+          - Path=/user/*
 eureka:
   client:
     service-url:
@@ -46,5 +31,6 @@ token:
   expiration: 1800
   header: X_Auth_Token
   refreshInterval: 300
+  cookieName: lemon_cookie
 
 

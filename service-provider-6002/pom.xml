@@ -17,6 +17,7 @@
     <properties>
         <java.version>1.8</java.version>
         <spring-cloud.version>Greenwich.SR1</spring-cloud.version>
+        <baseUtils.version>1.0-SNAPSHOT</baseUtils.version>
     </properties>
 
     <dependencies>
@@ -44,6 +45,12 @@
             <groupId>com.lemon</groupId>
             <artifactId>service-base</artifactId>
             <version>1.0-SNAPSHOT</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.lemon</groupId>
+            <artifactId>base-utils</artifactId>
+            <version>${baseUtils.version}</version>
         </dependency>
     </dependencies>
 

@@ -1,6 +1,6 @@
-package com.lemon.servicegateway.service.impl;
+package com.lemon.serviceloginservice.service.impl;
 
-import com.lemon.servicegateway.service.LoginService;
+import com.lemon.serviceloginservice.service.LoginService;
 import com.lemon.vo.User;
 import org.springframework.stereotype.Service;
 

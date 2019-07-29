@@ -1,0 +1,17 @@
+server:
+  port: 8001
+
+spring:
+  application:
+    name: service-login-api
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8080/eureka/
+
+token:
+  secret: secret
+  expiration: 1800
+  header: X_Auth_Token
+  refreshInterval: 300
+  cookieName: lemon_cookie
