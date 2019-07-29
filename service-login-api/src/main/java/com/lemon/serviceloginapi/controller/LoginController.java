@@ -59,6 +59,8 @@ public class LoginController {
             if(null != token) {
                 CookieUtil.addCookie(response, tokenProperties.getCookieName(), token,
                         tokenProperties.getExpiration().intValue());
+                CookieUtil.addCookie(response, "secret", tokenProperties.getSecret(),
+                        tokenProperties.getExpiration().intValue());
                 return ResultUtil.success();
             }
         }

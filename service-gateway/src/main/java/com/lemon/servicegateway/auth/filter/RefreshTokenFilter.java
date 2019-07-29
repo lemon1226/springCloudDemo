@@ -51,9 +51,12 @@ public class RefreshTokenFilter implements WebFilter {
 
                         ResponseCookie responseCookie = ResponseCookie.from(tokenProperties.getCookieName(), tokenUUID)
                                 .maxAge(tokenProperties.getExpiration()).build();
+                        ResponseCookie secretCookie = ResponseCookie.from("secret", tokenProperties.getSecret())
+                                .maxAge(tokenProperties.getExpiration()).build();
 
                         request.getCookies().clear();
                         exchange.getResponse().addCookie(responseCookie);
+                        exchange.getResponse().addCookie(secretCookie);
                     }
                 }
             }
