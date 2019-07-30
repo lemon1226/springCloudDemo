@@ -17,6 +17,7 @@
     <properties>
         <java.version>1.8</java.version>
         <spring-cloud.version>Greenwich.SR1</spring-cloud.version>
+        <my-boot-config.version>1.0-SNAPSHOT</my-boot-config.version>
     </properties>
 
     <dependencies>
@@ -50,6 +51,12 @@
         <dependency>
             <groupId>io.github.openfeign</groupId>
             <artifactId>feign-httpclient</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.lemon</groupId>
+            <artifactId>my-spring-boot-starter</artifactId>
+            <version>${my-boot-config.version}</version>
         </dependency>
     </dependencies>
 
