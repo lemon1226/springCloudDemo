@@ -11,5 +11,17 @@ eureka:
 zuul:
   routes:
     api-a:
-      path: /api-a/**
+      path: /lemon/**
       serviceId: service-napi
+    auth:
+      path: /auth/**
+      serviceId: service-login-api
+  add-host-header: true
+  sensitive-headers:
+
+token:
+  secret: secret
+  expiration: 1800
+  header: X_Auth_Token
+  refreshInterval: 3000
+  cookieName: lemon_cookie

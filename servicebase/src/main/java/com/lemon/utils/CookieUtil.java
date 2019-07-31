@@ -58,4 +58,24 @@ public class CookieUtil {
         }
         return null;
     }
+
+    /**
+     * 是否存在cookie
+     *
+     * @param request
+     * @return
+     */
+    public static boolean isExist(HttpServletRequest request,String cookieName) {
+        Cookie cookies[] = request.getCookies();
+
+        if(null == cookies || cookies.length == 0){
+            return false;
+        }
+        for (Cookie cookie : cookies) {
+            if (cookie.getName().equals(cookieName)) {
+                return true;
+            }
+        }
+        return false;
+    }
 }
